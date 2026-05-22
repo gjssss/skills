@@ -1,0 +1,7 @@
+interface:
+  display_name: "Task Workflow"
+  short_description: "Create and run numbered task workflows"
+  default_prompt: "Use $task-workflow to create or run numbered Markdown tasks."
+
+policy:
+  allow_implicit_invocation: false
