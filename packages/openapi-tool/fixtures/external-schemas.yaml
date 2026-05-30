@@ -1,0 +1,11 @@
+UserResponse:
+  type: object
+  required:
+    - id
+    - oldField
+  properties:
+    id:
+      type: string
+    oldField:
+      type: string
+      deprecated: true

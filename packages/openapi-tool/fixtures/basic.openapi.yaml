@@ -1,0 +1,83 @@
+openapi: 3.1.0
+info:
+  title: Basic Test API
+  version: 1.0.0
+paths:
+  /users:
+    parameters:
+      - name: tenantId
+        in: header
+        schema:
+          type: string
+      - name: oldTenant
+        in: header
+        deprecated: true
+        schema:
+          type: string
+    post:
+      summary: Create user
+      description: Create a user account.
+      tags:
+        - User
+      operationId: createUser
+      parameters:
+        - name: verbose
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: './external-schemas.yaml#/UserResponse'
+      x-test-extension: enabled
+    get:
+      summary: List users
+      description: Return users.
+      tags:
+        - User
+      operationId: listUsers
+      responses:
+        '200':
+          description: OK
+  /legacy:
+    get:
+      summary: Legacy endpoint
+      description: This API should be hidden.
+      deprecated: true
+      tags:
+        - Legacy
+      operationId: legacyEndpoint
+      responses:
+        '200':
+          description: OK
+  /orders:
+    get:
+      description: Get orders.
+      tags:
+        - Order
+      operationId: getOrders
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    CreateUserRequest:
+      type: object
+      required:
+        - name
+        - oldField
+      properties:
+        name:
+          type: string
+        oldField:
+          type: string
+          deprecated: true

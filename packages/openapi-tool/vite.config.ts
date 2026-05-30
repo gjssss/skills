@@ -15,7 +15,7 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     reportCompressedSize: false,
     lib: {
       entry: resolve(packageRoot, 'src/cli.ts'),
@@ -26,7 +26,6 @@ export default defineConfig({
       external: (id) => runtimeBuiltins.has(id),
       output: {
         banner: '#!/usr/bin/env bun',
-        inlineDynamicImports: true,
       },
     },
   },

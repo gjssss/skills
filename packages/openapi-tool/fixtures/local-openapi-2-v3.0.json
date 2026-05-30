@@ -1,0 +1,698 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "旦聚旦",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "元数据"
+    }
+  ],
+  "paths": {
+    "/metadata/user-metadata/{metadataId}": {
+      "put": {
+        "summary": "修改用户元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-updateUser",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "metadataId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.eggcampus.djd.model.req.metadata.UpdateUserMetadataReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.common.MessageResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "delete": {
+        "summary": "删除用户元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-deleteUser",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "metadataId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.common.MessageResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/metadata/admin/system-metadata/{metadataId}": {
+      "put": {
+        "summary": "修改系统元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-updateSystem",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "metadataId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.eggcampus.djd.model.req.metadata.UpdateSystemMetadataReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.common.MessageResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "delete": {
+        "summary": "删除系统元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-deleteSystem",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "metadataId",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "example": 0,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.common.MessageResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/metadata/user-metadata": {
+      "get": {
+        "summary": "获取用户元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-getUser",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.UserMetadataResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "summary": "创建用户元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-createUser",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.eggcampus.djd.model.req.metadata.CreateUserMetadataReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.CreateMetadataResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/metadata/admin/system-metadata": {
+      "post": {
+        "summary": "创建系统元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-createSystem",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/com.eggcampus.djd.model.req.metadata.CreateSystemMetadataReq"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.CreateMetadataResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/metadata/system-metadata": {
+      "get": {
+        "summary": "获取系统元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-getSystem",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 255,
+              "minLength": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.SystemMetadataResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    },
+    "/metadata/admin/system-metadatas": {
+      "get": {
+        "summary": "分页获取系统元数据",
+        "deprecated": false,
+        "description": "",
+        "operationId": "Metadata-pageSystem",
+        "tags": [
+          "元数据",
+          "元数据"
+        ],
+        "parameters": [
+          {
+            "name": "current",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "maximum": 1000,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 10,
+              "maximum": 1000,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.MetadataPageResp"
+                }
+              }
+            },
+            "headers": {}
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "com.eggcampus.djd.model.req.metadata.UpdateUserMetadataReq": {
+        "type": "object",
+        "description": "更新用户元数据请求",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "值"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.common.MessageResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "接口返回的数据内容"
+          },
+          "msg": {
+            "type": "string",
+            "description": "返回给前端用户的提示文案",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.common.MessageResp"
+          },
+          "error": {
+            "type": "string",
+            "description": "供开发/运维排查问题的详细错误信息",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "com.eggcampus.djd.model.req.metadata.UpdateSystemMetadataReq": {
+        "type": "object",
+        "description": "更新系统元数据请求",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "值"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "是否公开"
+          }
+        },
+        "required": [
+          "value",
+          "isPublic"
+        ]
+      },
+      "com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.UserMetadataResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "接口返回的数据内容"
+          },
+          "msg": {
+            "type": "string",
+            "description": "返回给前端用户的提示文案",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.metadata.UserMetadataResp"
+          },
+          "error": {
+            "type": "string",
+            "description": "供开发/运维排查问题的详细错误信息",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "com.eggcampus.djd.model.req.metadata.CreateUserMetadataReq": {
+        "type": "object",
+        "description": "创建用户元数据请求",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "名称",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "value": {
+            "type": "string",
+            "description": "值"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ]
+      },
+      "com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.CreateMetadataResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "接口返回的数据内容"
+          },
+          "msg": {
+            "type": "string",
+            "description": "返回给前端用户的提示文案",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.metadata.CreateMetadataResp"
+          },
+          "error": {
+            "type": "string",
+            "description": "供开发/运维排查问题的详细错误信息",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "com.eggcampus.djd.model.req.metadata.CreateSystemMetadataReq": {
+        "type": "object",
+        "description": "创建系统元数据请求",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "名称",
+            "maxLength": 255,
+            "minLength": 0
+          },
+          "value": {
+            "type": "string",
+            "description": "值"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "是否公开"
+          }
+        },
+        "required": [
+          "name",
+          "value",
+          "isPublic"
+        ]
+      },
+      "com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.SystemMetadataResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "接口返回的数据内容"
+          },
+          "msg": {
+            "type": "string",
+            "description": "返回给前端用户的提示文案",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.metadata.SystemMetadataResp"
+          },
+          "error": {
+            "type": "string",
+            "description": "供开发/运维排查问题的详细错误信息",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "com.eggcampus.util.base.api.ResultCom.eggcampus.djd.model.resp.metadata.MetadataPageResp": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "接口返回的数据内容"
+          },
+          "msg": {
+            "type": "string",
+            "description": "返回给前端用户的提示文案",
+            "nullable": true
+          },
+          "data": {
+            "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.metadata.MetadataPageResp"
+          },
+          "error": {
+            "type": "string",
+            "description": "供开发/运维排查问题的详细错误信息",
+            "nullable": true
+          }
+        },
+        "required": [
+          "code"
+        ]
+      },
+      "com.eggcampus.djd.model.resp.common.MessageResp": {
+        "type": "object",
+        "description": "通用消息响应",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "消息"
+          }
+        }
+      },
+      "com.eggcampus.djd.model.resp.metadata.UserMetadataResp": {
+        "type": "object",
+        "description": "用户元数据返回对象",
+        "properties": {
+          "metadataId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "元数据ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名称"
+          },
+          "value": {
+            "type": "string",
+            "description": "值"
+          }
+        }
+      },
+      "com.eggcampus.djd.model.resp.metadata.CreateMetadataResp": {
+        "type": "object",
+        "description": "创建元数据响应",
+        "properties": {
+          "metadataId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "元数据ID"
+          }
+        }
+      },
+      "com.eggcampus.djd.model.resp.metadata.SystemMetadataResp": {
+        "type": "object",
+        "description": "系统元数据返回对象",
+        "properties": {
+          "metadataId": {
+            "type": "integer",
+            "format": "int64",
+            "description": "元数据ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "名称"
+          },
+          "value": {
+            "type": "string",
+            "description": "值"
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "是否公开"
+          }
+        }
+      },
+      "com.eggcampus.djd.model.resp.metadata.MetadataPageResp": {
+        "type": "object",
+        "description": "元数据分页结果",
+        "properties": {
+          "records": {
+            "type": "array",
+            "description": "记录列表",
+            "items": {
+              "$ref": "#/components/schemas/com.eggcampus.djd.model.resp.metadata.SystemMetadataResp"
+            }
+          },
+          "current": {
+            "type": "integer",
+            "format": "int32",
+            "description": "当前页码"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32",
+            "description": "每页条数"
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "总数"
+          }
+        }
+      }
+    },
+    "securitySchemes": {}
+  },
+  "servers": []
+}

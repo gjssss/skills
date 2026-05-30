@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "types": [
+      "bun",
       "node"
     ]
   },
