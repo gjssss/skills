@@ -5,17 +5,25 @@ Use this workflow when the user asks to generate numbered Markdown task files.
 ## Workflow
 
 1. Identify the task folder from the user request. If missing, ask for it before continuing.
-2. Run `inspect` before writing task files:
+2. Check that Bun is available before running the bundled script:
 
 ```bash
-node <skill-dir>/scripts/task_workflow.mjs inspect <task-dir> [--number <positive-int>] [--create]
+command -v bun >/dev/null
 ```
 
-3. Use `--create` when the user provided a folder that does not exist.
-4. Use `--number <n>` when the user specified a starting task number.
-5. If no number is specified, use the returned `startNumber`.
-6. If the user explicitly provides a task split, follow it.
-7. If no split is provided, split the request into a small number of atomic tasks, usually 1-4 and no more than 5 unless explicitly requested.
+If Bun is missing, stop and ask the user to install it; do not install it automatically.
+
+3. Run `inspect` before writing task files:
+
+```bash
+bun <skill-dir>/scripts/task_workflow.ts inspect <task-dir> [--number <positive-int>] [--create]
+```
+
+4. Use `--create` when the user provided a folder that does not exist.
+5. Use `--number <n>` when the user specified a starting task number.
+6. If no number is specified, use the returned `startNumber`.
+7. If the user explicitly provides a task split, follow it.
+8. If no split is provided, split the request into a small number of atomic tasks, usually 1-4 and no more than 5 unless explicitly requested.
 
 ## Numbering And Naming
 

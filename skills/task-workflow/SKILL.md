@@ -18,12 +18,14 @@ Read only the workflow document needed for the user's requested work:
 ## Script
 
 ```bash
-node <skill-dir>/scripts/task_workflow.mjs <command> ...
+command -v bun >/dev/null
+bun <skill-dir>/scripts/task_workflow.ts <command> ...
 ```
 
 Resolve `<skill-dir>` to this skill folder. Do not hard-code an absolute user path.
+Before running the script, check that `bun` exists. If it is missing, stop and ask the user to install Bun; do not install it automatically.
 
 ```bash
-node <skill-dir>/scripts/task_workflow.mjs inspect <task-dir> [--number <positive-int>] [--create]
-node <skill-dir>/scripts/task_workflow.mjs group <task-dir> [--from <positive-int>]
+bun <skill-dir>/scripts/task_workflow.ts inspect <task-dir> [--number <positive-int>] [--create]
+bun <skill-dir>/scripts/task_workflow.ts group <task-dir> [--from <positive-int>]
 ```
