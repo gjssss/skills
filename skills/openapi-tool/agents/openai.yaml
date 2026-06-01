@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenAPI Tool"
+  short_description: "Inspect OpenAPI files with a bundled CLI"
+  default_prompt: "Use $openapi-tool to list APIs from this OpenAPI document and get details for the relevant endpoint."
