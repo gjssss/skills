@@ -26,7 +26,21 @@ bun <skill-dir>/scripts/task_workflow.ts group <task-dir> [--from <number>]
 8. Within one group, launch one subagent per task file in parallel when subagents are available. If subagents are unavailable, run the files one by one but do not start the next numbered group early.
 9. Read each task file before launching its execution. Include the task path and full Markdown content in the prompt.
 10. Tell every executor it is not alone in the codebase, must not revert edits made by others, and must adapt to concurrent changes.
-11. If any task fails or reports incomplete work, stop before the next group and summarize completed tasks, failed tasks, and the failure reason.
+11. Tell every executor to commit its completed task automatically when its work is done and the working directory is inside a Git repository. If the task is not inside a Git repository, skip the commit and report that no Git repository was found.
+12. If any task fails, reports incomplete work, or cannot safely commit task-owned changes in a Git repository, stop before the next group and summarize completed tasks, failed tasks, committed tasks, uncommitted tasks, and the failure reason.
+
+## Git Commit Behavior
+
+When a task completes successfully:
+
+- Detect whether the task work happened inside a Git repository with `git rev-parse --show-toplevel`.
+- If there is no Git repository, do not treat that as a task failure; skip the commit and report it.
+- Commit only changes owned by the completed task. Do not stage or commit unrelated pre-existing user edits or changes from other concurrent tasks.
+- Prefer staging explicit task-owned paths with `git add -- <paths>`. Avoid broad staging commands such as `git add -A` unless the executor has confirmed every changed path belongs to the completed task.
+- If the executor cannot distinguish task-owned changes from unrelated dirty work, do not commit. Treat that as an unsafe commit condition and stop before the next numbered group.
+- If the task produced no Git changes, skip the commit and report that there was nothing to commit.
+- Use a concise commit message: `task-workflow: complete <task-file-name>`.
+- Do not push unless the user explicitly requested pushing.
 
 ## Group Validation
 

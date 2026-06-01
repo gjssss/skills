@@ -3,6 +3,9 @@ import { spawn } from 'node:child_process'
 import { readFile } from 'node:fs/promises'
 import { fileURLToPath } from 'node:url'
 import { afterEach, describe, expect, it } from 'vitest'
+import { loadDocument } from '../src/core/parse-document'
+import { resolveRefs } from '../src/core/resolve-ref'
+import type { SourceInput } from '../src/types'
 
 const packageRoot = fileURLToPath(new URL('..', import.meta.url))
 const cliEntry = 'src/cli.ts'
@@ -232,12 +235,29 @@ describe('openapi-tool cli', () => {
     expect(parseStdout(github).pagination.total).toBeGreaterThan(100)
   })
 
-  it('reports circular refs without hanging', async () => {
+  it('keeps circular refs as refs without hanging', async () => {
     const result = await runCli(['get', '0', '--file', 'fixtures/circular.openapi.yaml'])
 
-    expect(result.code).toBe(1)
-    const payload = JSON.parse(result.stderr)
-    expect(payload.error.code).toBe('CIRCULAR_REF')
+    expect(result.stderr).toBe('')
+    expect(result.code).toBe(0)
+
+    const payload = parseStdout(result)
+    expect(payload.api.responses['200'].content['application/json'].schema).toEqual({
+      $ref: '#/components/schemas/Node',
+    })
+
+    const fixtureUrl = new URL('../fixtures/circular.openapi.yaml', import.meta.url)
+    const source: SourceInput = {
+      type: 'file',
+      value: 'fixtures/circular.openapi.yaml',
+      baseUri: fixtureUrl.href,
+    }
+    const { document } = await loadDocument(source)
+    const resolved = await resolveRefs(source, document)
+    const nodeSchema = (resolved as any).components.schemas.Node
+    expect(nodeSchema.properties.child).toEqual({
+      $ref: '#/components/schemas/Node',
+    })
   })
 })
 

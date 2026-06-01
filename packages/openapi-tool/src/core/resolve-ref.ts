@@ -6,7 +6,7 @@ export async function resolveRefs(source: SourceInput, document: JsonObject): Pr
   try {
     return await $RefParser.dereference(source.baseUri, document, {
       dereference: {
-        circular: false,
+        circular: 'ignore',
         preservedProperties: ['description', 'summary'],
         externalReferenceResolution: 'relative',
       },
