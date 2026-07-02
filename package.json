@@ -7,10 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "test": "vitest run",
-    "build:openapi-tool": "bun run --cwd packages/openapi-tool build",
-    "test:openapi-tool": "bun run --cwd packages/openapi-tool test",
-    "typecheck:openapi-tool": "bun run --cwd packages/openapi-tool typecheck"
+    "test": "vitest run"
   },
   "devDependencies": {
     "@types/bun": "^1.3.14",
