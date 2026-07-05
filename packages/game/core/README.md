@@ -1,6 +1,6 @@
 # @djd/game-core
 
-Shared starter utilities for the DJD game workspace.
+Pure Dou Dizhu rules, state transitions, action validation, and protocol types.
 
 ## Scripts
 

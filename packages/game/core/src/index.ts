@@ -1,22 +1,6 @@
-export interface HelloPayload {
-  message: string
-  time: string
-}
-
-export function buildGreeting(name = 'world') {
-  return `Hello, ${name}!`
-}
-
-export function formatBackendStatus(payload?: HelloPayload) {
-  if (!payload) {
-    return {
-      title: 'Waiting',
-      subtitle: 'Waiting for server response',
-    }
-  }
-
-  return {
-    title: payload.message,
-    subtitle: `Updated at ${payload.time}`,
-  }
-}
+export * from './types'
+export * from './deck'
+export * from './combo'
+export * from './state'
+export * from './view'
+export * from './reducer'

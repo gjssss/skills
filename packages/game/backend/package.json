@@ -3,6 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "build": "tsc -p tsconfig.json --noEmit && vite build",

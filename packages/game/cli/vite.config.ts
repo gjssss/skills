@@ -22,6 +22,7 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [
+        '@djd/game-backend',
         '@djd/game-core',
         ...builtinModules,
         ...builtinModules.map((module) => `node:${module}`)
@@ -29,6 +30,7 @@ export default defineConfig({
       output: {
         banner: '#!/usr/bin/env bun',
         paths: {
+          '@djd/game-backend': './web/backend/index.js',
           '@djd/game-core': './core/dist/index.js'
         }
       }

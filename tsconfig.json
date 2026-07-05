@@ -16,6 +16,7 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "paths": {
+      "@djd/game-backend": ["packages/game/backend/src/index.ts"],
       "@djd/game-core": ["packages/game/core/src/index.ts"]
     },
 

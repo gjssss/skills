@@ -1,6 +1,6 @@
 # @djd/game-backend
 
-Starter Hono API server for the DJD game workspace.
+Authoritative in-memory Dou Dizhu HTTP server for CLI-driven games.
 
 ## Scripts
 
@@ -11,4 +11,7 @@ Starter Hono API server for the DJD game workspace.
 ## API
 
 - `GET /api/health`
-- `GET /api/hello`
+- `POST /rooms/:roomId/join`
+- `POST /rooms/:roomId/actions`
+- `GET /rooms/:roomId/events?afterSeq=...`
+- `GET /rooms/:roomId/state?playerId=...`
