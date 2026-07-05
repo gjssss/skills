@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     // Environment setup & latest features
+    "baseUrl": ".",
     "lib": ["ESNext"],
     "types": ["bun", "node"],
     "target": "ESNext",
@@ -14,6 +15,9 @@
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
+    "paths": {
+      "@djd/game-core": ["packages/game/core/src/index.ts"]
+    },
 
     // Best practices
     "strict": true,

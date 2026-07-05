@@ -9,3 +9,20 @@
 用于创建和执行按数字编号的 Markdown 任务工作流。它支持生成 `<number>.<slug>.md` 形式的任务文件，也支持按编号顺序执行任务；同一编号下的多个任务可以视为可并行执行的独立任务。
 
 位置：`skills/task-workflow`
+
+## Packages
+
+### `packages/game`
+
+初始化为 Bun 工作区的 game 包组：
+
+- `packages/game/core`
+- `packages/game/backend`
+- `packages/game/cli`
+- `packages/game/frontend`
+
+常用命令：
+
+- `bun run typecheck:game`
+- `bun run build:game`
+- `bun run start:game -- web --port 3001`

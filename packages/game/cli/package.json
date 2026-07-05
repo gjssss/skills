@@ -1,0 +1,32 @@
+{
+  "name": "@djd/game-cli",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Starter Bun CLI for the DJD game workspace",
+  "bin": {
+    "djd-game": "dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "scripts": {
+    "build": "bun scripts/build-web.mjs",
+    "build:cli": "tsc -p tsconfig.json --noEmit && vite build",
+    "dev": "vite build --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "start": "bun dist/cli.js"
+  },
+  "dependencies": {
+    "commander": "^14.0.3"
+  },
+  "devDependencies": {
+    "@djd/game-core": "workspace:*",
+    "@types/node": "24.12.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.3.1"
+  }
+}
