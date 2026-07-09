@@ -1,6 +1,5 @@
-import type { GameState, LegalAction, PlayerView, PublicStateView } from './types'
+import type { GameState, PlayerView, PublicStateView } from './types'
 import { sortCards } from './deck'
-import { getLegalActions } from './reducer'
 import { getPlayer, playerRole } from './state'
 
 export function createPublicView(state: GameState): PublicStateView {
@@ -24,7 +23,7 @@ export function createPublicView(state: GameState): PublicStateView {
 export function createPlayerView(state: GameState, playerId: string): PlayerView {
   const player = getPlayer(state, playerId)
   if (!player) throw new Error(`Unknown player: ${playerId}`)
-  const viewWithoutActions: Omit<PlayerView, 'legalActions'> = {
+  return {
     ...createPublicView(state),
     playerId,
     seat: player.seat,
@@ -32,11 +31,4 @@ export function createPlayerView(state: GameState, playerId: string): PlayerView
     hand: sortCards(state.hands[playerId] ?? []),
     bottomCards: state.stage === 'waiting' || state.stage === 'bidding' ? [] : state.bottomCards,
   }
-
-  const view = {
-    ...viewWithoutActions,
-    legalActions: [] as LegalAction[],
-  }
-  view.legalActions = getLegalActions(view)
-  return view
 }

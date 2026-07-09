@@ -1,6 +1,7 @@
 import type { GameAction, GameState, PlayerInfo, ServerSeq } from '@djd/game-core'
 import { applyAction, attachPending, createWaitingState, startBidding } from '@djd/game-core'
-import { finishedEvent, jsonKey, now, publicPendingEvent, WAIT_TIMEOUT_MS } from './events'
+import { finishedEvent, now, publicPendingEvent, WAIT_TIMEOUT_MS } from './events'
+import { jsonKey } from './payload-key'
 import type { ServerEvent, StoredIdempotency, Waiter } from './types'
 
 export class GameRoom {

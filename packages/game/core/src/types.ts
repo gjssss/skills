@@ -116,7 +116,6 @@ export interface PlayerView {
   pending?: PendingAction
   currentBid: BidValue
   lastPlay?: PlayedTrick
-  legalActions: LegalAction[]
   finished?: GameState['finished']
 }
 
