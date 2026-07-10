@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@djd/game-core": "workspace:*",
+    "@djd/game-web-contract": "workspace:*",
     "hono": "^4.12.9"
   },
   "devDependencies": {

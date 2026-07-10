@@ -1,5 +1,5 @@
 export interface CliConfig {
-  version: 1
+  version: 2
   player: {
     nickname: string | null
   }
@@ -13,7 +13,8 @@ export interface CliConfig {
   rooms: Record<string, {
     server: string
     roomId: string
-    playerId: string
+    playerId: string | null
+    resumeKey: string | null
     serverSeq: number
     updatedAt: string
   }>
@@ -25,6 +26,20 @@ export interface CliConfig {
     farmerGames: number
     lastGameAt: string | null
   }
+}
+
+export interface LegacyCliConfigV1 {
+  version: 1
+  player?: CliConfig['player']
+  current?: CliConfig['current']
+  rooms?: Record<string, {
+    server: string
+    roomId: string
+    playerId: string
+    serverSeq: number
+    updatedAt: string
+  }>
+  stats?: CliConfig['stats']
 }
 
 export interface GlobalOptions {

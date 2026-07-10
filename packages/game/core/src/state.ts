@@ -1,4 +1,5 @@
 import type { GameState, PlayerInfo, PlayerRole, ServerSeq } from './types'
+import type { RandomSource } from './deck'
 import { dealCards } from './deck'
 
 export function createWaitingState(roomId: string): GameState {
@@ -21,8 +22,13 @@ export function createWaitingState(roomId: string): GameState {
   }
 }
 
-export function startBidding(state: GameState, seed = Date.now(), redeals = state.bid.redeals): GameState {
-  const dealt = dealCards(state.players, seed + redeals)
+export function startBidding(
+  state: GameState,
+  source?: number | RandomSource,
+  redeals = state.bid.redeals,
+): GameState {
+  const dealSource = typeof source === 'number' ? source + redeals : source
+  const dealt = dealCards(state.players, dealSource)
   const first = state.players[0]
   if (!first) throw new Error('Cannot start game without players')
 

@@ -32,6 +32,39 @@ describe('game WebSocket protocol', () => {
       idempotencyKey: 'action-7',
       action: { type: 'play', cards: ['S3'], expectedSeq: 7 },
     })
+
+    expect(parseClientMessage({
+      type: 'session.open',
+      mode: 'resume',
+      roomId: ' room_a ',
+      playerId: ' p1 ',
+      resumeKey: ' secret-key ',
+      afterSeq: 3,
+    })).toEqual({
+      type: 'session.open',
+      mode: 'resume',
+      roomId: 'room_a',
+      playerId: 'p1',
+      resumeKey: 'secret-key',
+      afterSeq: 3,
+    })
+  })
+
+  it('keeps a missing resume key parseable so the transport can reject it uniformly with 4403', () => {
+    expect(parseClientMessage({
+      type: 'session.open',
+      mode: 'resume',
+      roomId: 'room_a',
+      playerId: 'p1',
+      afterSeq: 0,
+    })).toEqual({
+      type: 'session.open',
+      mode: 'resume',
+      roomId: 'room_a',
+      playerId: 'p1',
+      resumeKey: undefined,
+      afterSeq: 0,
+    })
   })
 
   it('rejects invalid modes, unknown messages, and invalid cards', () => {

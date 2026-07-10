@@ -14,15 +14,18 @@
 
 ### `packages/game`
 
-初始化为 Bun 工作区的 game 包组：
+基于 Bun 的斗地主玩家 CLI、公开只读观战和完局复盘包组：
 
 - `packages/game/core`
+- `packages/game/web-contract`
 - `packages/game/backend`
 - `packages/game/cli`
 - `packages/game/frontend`
 
 常用命令：
 
-- `bun run typecheck:game`
-- `bun run build:game`
-- `bun run start:game -- web --port 3001`
+- 聚合构建：`bun run --cwd packages/game/cli build`
+- 启动完整服务：`bun run --cwd packages/game/cli start -- server --port 8787`
+- 类型检查：分别在 `core`、`web-contract`、`frontend`、`backend`、`cli` 包中运行 `bun run typecheck`
+
+实现边界、构建顺序和 curl 验收示例见 [`packages/game/README.md`](packages/game/README.md)。

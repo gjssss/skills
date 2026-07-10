@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import { startGameServer } from '@djd/game-backend'
 import { Command } from 'commander'
 import { parseActionFromInput } from './action-input'
-import { loadConfig, saveConfig, updateCurrentFromResponse, updateStats } from './config'
+import { loadConfig, redactedConfig, saveConfig, updateCurrentFromResponse, updateStats } from './config'
 import { printJson } from './output'
 import { resolveCliDist } from './paths'
 import type { GlobalOptions } from './types'
@@ -41,11 +41,15 @@ export function createProgram(version: string) {
     .option('--host <host>', 'Set server host', '127.0.0.1')
     .option('--port <port>', 'Set server port', '8787')
     .option('--seed <seed>', 'Set deterministic seed')
-    .action(async (options: { host: string; port: string; seed?: string } & GlobalOptions) => {
+    .option('--data-file <path>', 'Set completed-session SQLite path', './.djd-game/sessions.sqlite')
+    .action(async (options: { host: string; port: string; seed?: string; dataFile: string } & GlobalOptions) => {
       const globals = mergeOptions(options)
       const { path, config } = await loadConfig(globals)
       const port = Number(options.port)
       const seed = options.seed === undefined ? undefined : Number(options.seed)
+      if (seed !== undefined) {
+        console.error('[warning] --seed enables deterministic dealing and is intended for local tests only.')
+      }
       const server = asWebSocketUrl(`ws://${options.host}:${port}`)
       const http = asHttpUrl(server)
       config.current.server = server
@@ -55,11 +59,13 @@ export function createProgram(version: string) {
         server,
         http,
         seed,
+        dataFile: options.dataFile,
       })
       startGameServer({
         host: options.host,
         port,
         seed,
+        dataFile: options.dataFile,
         frontendDist: resolve(resolveCliDist(), 'web', 'frontend'),
         log: true,
       })
@@ -88,6 +94,7 @@ export function createProgram(version: string) {
         mode: playerId ? 'resume' : 'join',
         name: playerId ? undefined : name,
         playerId,
+        resumeKey: playerId && roomConfig?.playerId === playerId ? (roomConfig.resumeKey ?? undefined) : undefined,
         afterSeq: playerId ? (roomConfig?.serverSeq ?? config.current.serverSeq) : 0,
         onAccepted: async (accepted) => {
           const acceptedPlayerId = accepted.player?.playerId
@@ -99,6 +106,7 @@ export function createProgram(version: string) {
               server: context.server,
               roomId: context.roomId,
               playerId: acceptedPlayerId,
+              resumeKey: accepted.resumeKey ?? roomConfig?.resumeKey ?? null,
               serverSeq: roomConfig?.serverSeq ?? config.current.serverSeq,
               updatedAt: new Date().toISOString(),
             }
@@ -141,6 +149,7 @@ export function createProgram(version: string) {
         roomId: context.roomId,
         mode: 'resume',
         playerId: context.playerId,
+        resumeKey: context.resumeKey,
         afterSeq: config.rooms[context.roomId]?.serverSeq ?? config.current.serverSeq,
         action,
         idempotencyKey,
@@ -168,6 +177,7 @@ export function createProgram(version: string) {
         roomId: context.roomId,
         mode: sessionMode(context.playerId),
         playerId: context.playerId,
+        resumeKey: context.resumeKey,
         afterSeq,
       })
       printJson(response)
@@ -190,6 +200,9 @@ export function createProgram(version: string) {
         roomId: context.roomId,
         mode: sessionMode(playerId),
         playerId,
+        resumeKey: playerId && config.rooms[context.roomId]?.playerId === playerId
+          ? (config.rooms[context.roomId]?.resumeKey ?? undefined)
+          : undefined,
         afterSeq: config.rooms[context.roomId]?.serverSeq ?? config.current.serverSeq,
       })
       updateCurrentFromResponse(config, context, response)
@@ -206,7 +219,7 @@ export function createProgram(version: string) {
     .action(async (options: GlobalOptions) => {
       const globals = mergeOptions(options)
       const { config } = await loadConfig(globals)
-      printJson(config)
+      printJson(redactedConfig(config))
     })
   
   configCommand
@@ -221,7 +234,7 @@ export function createProgram(version: string) {
       else if (key === 'server') config.current.server = asWebSocketUrl(value)
       else throw new Error('Supported keys: nickname, server')
       await saveConfig(path, config)
-      printJson({ ok: true, config })
+      printJson({ ok: true, config: redactedConfig(config) })
     })
   
   configCommand

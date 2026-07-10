@@ -5,6 +5,7 @@ declare module '@djd/game-backend' {
     host?: string
     port?: number
     seed?: number
+    dataFile?: string
     frontendDist?: string
     log?: boolean
   }

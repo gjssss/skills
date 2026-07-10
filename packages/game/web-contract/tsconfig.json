@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.node.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@djd/game-core": ["../core/dist/index.d.ts"]
+    },
+    "rootDir": "src",
+    "outDir": "dist",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "allowImportingTsExtensions": false
+  },
+  "include": ["src"]
+}

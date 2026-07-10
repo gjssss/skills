@@ -1,5 +1,7 @@
 import type { CardId, PlayerInfo, Rank, Suit, ValidationResult } from './types'
 
+export type RandomSource = () => number
+
 export const RANKS: Rank[] = [
   '3',
   '4',
@@ -81,8 +83,16 @@ export function createSeededRandom(seed = Date.now()): () => number {
   }
 }
 
-export function shuffleDeck(seed = Date.now()): CardId[] {
-  const random = createSeededRandom(seed)
+export function createSecureRandom(): RandomSource {
+  return () => {
+    const value = new Uint32Array(1)
+    globalThis.crypto.getRandomValues(value)
+    return (value[0] ?? 0) / 0x100000000
+  }
+}
+
+export function shuffleDeck(source: number | RandomSource = createSecureRandom()): CardId[] {
+  const random = typeof source === 'number' ? createSeededRandom(source) : source
   const deck = [...FULL_DECK]
   for (let i = deck.length - 1; i > 0; i -= 1) {
     const j = Math.floor(random() * (i + 1))
@@ -95,8 +105,8 @@ export function shuffleDeck(seed = Date.now()): CardId[] {
   return deck
 }
 
-export function dealCards(players: PlayerInfo[], seed = Date.now()) {
-  const deck = shuffleDeck(seed)
+export function dealCards(players: PlayerInfo[], source: number | RandomSource = createSecureRandom()) {
+  const deck = shuffleDeck(source)
   const hands: Record<string, CardId[]> = {}
   for (const player of players) {
     hands[player.playerId] = sortCards(deck.slice(player.seat * 17, player.seat * 17 + 17))

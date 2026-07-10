@@ -17,12 +17,54 @@ function json(message: ControlMessage | ServerEvent) {
 }
 
 export function projectEvent(event: ServerEvent, playerId?: string): ServerEvent {
-  if (event.type !== 'bid.request' && event.type !== 'turn.request') return event
-  if (event.playerId === playerId) return event
-  const projected = { ...event }
-  delete projected.hand
-  delete projected.availableBids
-  return projected
+  const base: ServerEvent = {
+    seq: event.seq,
+    roomId: event.roomId,
+    type: event.type,
+    createdAt: event.createdAt,
+  }
+  switch (event.type) {
+    case 'room.created':
+      return { ...base, stage: event.stage }
+    case 'player.joined':
+      return { ...base, playerId: event.playerId, seat: event.seat, name: event.name }
+    case 'game.started':
+      return { ...base, stage: event.stage, players: event.players }
+    case 'bid.request':
+    case 'turn.request': {
+      const pending = {
+        ...base,
+        playerId: event.playerId,
+        seat: event.seat,
+        stage: event.stage,
+      }
+      if (event.playerId !== playerId) return pending
+      return {
+        ...pending,
+        hand: event.hand,
+        ...(event.type === 'bid.request' ? { availableBids: event.availableBids } : {}),
+      }
+    }
+    case 'action.accepted':
+      return {
+        ...base,
+        playerId: event.playerId,
+        expectedSeq: event.expectedSeq,
+        idempotencyKey: event.idempotencyKey,
+        action: event.action,
+      }
+    case 'landlord.decided':
+      return {
+        ...base,
+        landlordId: event.landlordId,
+        bottomCards: event.bottomCards,
+        bid: event.bid,
+      }
+    case 'game.finished':
+      return { ...base, stage: event.stage, finished: event.finished, state: event.state }
+    default:
+      return base
+  }
 }
 
 export class GameSocketHub {
@@ -103,12 +145,16 @@ export class GameSocketHub {
   private openSession(peer: WSContext, message: Extract<ClientMessage, { type: 'session.open' }>) {
     let room: GameRoom
     let playerId: string | undefined
+    let resumeKey: string | undefined
+    let changedEvents: ServerEvent[] = []
 
     if (message.mode === 'join') {
       room = this.server.getRoom(message.roomId)
       try {
         const mutation = room.join(message.name!)
         playerId = mutation.result.player.playerId
+        resumeKey = mutation.result.resumeKey
+        changedEvents = mutation.events
         this.broadcast(room.roomId, mutation.events)
       }
       catch (error) {
@@ -130,6 +176,10 @@ export class GameSocketHub {
           this.fail(peer, 4404, 'PLAYER_NOT_FOUND', `Player not found: ${message.playerId}`)
           return undefined
         }
+        if (!room.verifyResumeKey(player.playerId, message.resumeKey)) {
+          this.fail(peer, 4403, 'RESUME_KEY_INVALID', 'Invalid resume key')
+          return undefined
+        }
         playerId = player.playerId
       }
     }
@@ -141,6 +191,7 @@ export class GameSocketHub {
       this.connections.set(room.roomId, roomConnections)
     }
     roomConnections.add(session)
+    this.server.notify({ room, events: changedEvents })
 
     const player = playerId ? room.getPlayer(playerId) : undefined
     this.send(peer, {
@@ -148,6 +199,7 @@ export class GameSocketHub {
       mode: message.mode,
       roomId: room.roomId,
       player,
+      resumeKey,
       serverSeq: room.currentSeq(),
     })
     for (const event of room.getEvents(message.afterSeq)) {
@@ -180,6 +232,7 @@ export class GameSocketHub {
       )
       this.send(session.peer, mutation.result)
       this.broadcast(session.room.roomId, mutation.events)
+      this.server.notify({ room: session.room, events: mutation.events })
     }
     catch (error) {
       const messageText = error instanceof Error ? error.message : String(error)
@@ -226,5 +279,6 @@ export class GameSocketHub {
     if (!roomConnections) return
     roomConnections.delete(session)
     if (roomConnections.size === 0) this.connections.delete(session.room.roomId)
+    this.server.notify({ room: session.room, events: [] })
   }
 }

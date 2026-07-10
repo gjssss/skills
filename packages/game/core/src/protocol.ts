@@ -12,6 +12,7 @@ export type ClientMessage =
       roomId: string
       name?: string
       playerId?: string
+      resumeKey?: string
       afterSeq: ServerSeq
     }
   | {
@@ -36,6 +37,7 @@ export type ControlMessage =
       mode: SessionMode
       roomId: string
       player?: PlayerInfo
+      resumeKey?: string
       serverSeq: ServerSeq
     }
   | {
@@ -139,6 +141,10 @@ export function parseClientMessage(value: unknown): ClientMessage {
         mode: 'resume',
         roomId,
         playerId: requiredString(message.playerId, 'playerId'),
+        // Missing and malformed recovery credentials are intentionally left to
+        // the authentication boundary so they receive the same 4403 response
+        // before any room event can be replayed.
+        resumeKey: typeof message.resumeKey === 'string' ? message.resumeKey.trim() : undefined,
         afterSeq,
       }
     }

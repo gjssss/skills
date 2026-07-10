@@ -1,3 +1,4 @@
+import type { RandomSource } from './deck'
 import type { BidValue, CardCombo, CardId, GameAction, GameState, LegalAction, PlayerView, ServerSeq, ValidationResult } from './types'
 import { sortCards } from './deck'
 import { canBeat, identifyCombo } from './combo'
@@ -43,7 +44,7 @@ export function validateBidAction(state: GameState, playerId: string, action: Ex
   return { ok: true, value: bid as BidValue }
 }
 
-export function applyBid(state: GameState, playerId: string, bid: BidValue, seed = Date.now()): GameState {
+export function applyBid(state: GameState, playerId: string, bid: BidValue, source?: number | RandomSource): GameState {
   if (bid === 0) {
     const nextBid = {
       ...state.bid,
@@ -52,7 +53,7 @@ export function applyBid(state: GameState, playerId: string, bid: BidValue, seed
     }
 
     if (!state.bid.highBidderId && nextBid.totalActions >= state.players.length) {
-      return startBidding({ ...state, bid: { ...nextBid, redeals: state.bid.redeals + 1 } }, seed, state.bid.redeals + 1)
+      return startBidding({ ...state, bid: { ...nextBid, redeals: state.bid.redeals + 1 } }, source, state.bid.redeals + 1)
     }
 
     if (state.bid.highBidderId && nextBid.consecutivePasses >= state.players.length - 1) {
@@ -191,14 +192,19 @@ export function validateExpectedSeq(state: GameState, playerId: string, expected
   return { ok: true }
 }
 
-export function applyAction(state: GameState, playerId: string, action: GameAction, seed = Date.now()): ValidationResult<GameState> {
+export function applyAction(
+  state: GameState,
+  playerId: string,
+  action: GameAction,
+  source?: number | RandomSource,
+): ValidationResult<GameState> {
   const seqCheck = validateExpectedSeq(state, playerId, action.expectedSeq)
   if (!seqCheck.ok) return { ok: false, error: seqCheck.error }
 
   if (action.type === 'bid') {
     const bidCheck = validateBidAction(state, playerId, action)
     if (!bidCheck.ok || bidCheck.value === undefined) return { ok: false, error: bidCheck.error }
-    return { ok: true, value: applyBid(state, playerId, bidCheck.value, seed) }
+    return { ok: true, value: applyBid(state, playerId, bidCheck.value, source) }
   }
 
   if (action.type === 'pass') {

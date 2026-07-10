@@ -6,7 +6,8 @@
     "moduleResolution": "bundler",
     "lib": ["ES2022"],
     "paths": {
-      "@djd/game-core": ["core/src/index.ts"]
+      "@djd/game-core": ["core/src/index.ts"],
+      "@djd/game-web-contract": ["web-contract/src/index.ts"]
     },
     "types": ["node", "bun"],
     "strict": true,

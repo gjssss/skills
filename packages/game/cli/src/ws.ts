@@ -43,10 +43,13 @@ export function resolveContext(config: CliConfig, options: GlobalOptions) {
     ?? config.rooms[roomId]?.playerId
     ?? (config.current.roomId === roomId ? config.current.playerId : undefined)
   if (!server) throw new Error('Server is required. Use --server or config set server.')
+  const roomConfig = config.rooms[roomId]
+  const resumeKey = roomConfig?.playerId === playerId ? (roomConfig.resumeKey ?? undefined) : undefined
   return {
     server: asWebSocketUrl(server),
     roomId,
     playerId: playerId ?? undefined,
+    resumeKey,
   }
 }
 
@@ -56,6 +59,7 @@ interface SessionDescriptor {
   mode: SessionMode
   name?: string
   playerId?: string
+  resumeKey?: string
   afterSeq: number
 }
 
@@ -149,6 +153,7 @@ async function runWebSocketCommand<T>(options: RunnerOptions<T>): Promise<T> {
             roomId: options.session.roomId,
             name: options.session.name,
             playerId: options.session.playerId,
+            resumeKey: options.session.resumeKey,
             afterSeq: lastSeq,
           })
         })

@@ -1,4 +1,5 @@
 import type { ControlMessage, ServerEvent } from '@djd/game-core'
+import type { CompletedSessionStore } from './session-store'
 
 export type { ServerEvent } from '@djd/game-core'
 
@@ -7,6 +8,8 @@ export interface GameServerOptions {
   port?: number
   seed?: number
   frontendDist?: string
+  dataFile?: string
+  completedStore?: CompletedSessionStore
   log?: boolean
 }
 

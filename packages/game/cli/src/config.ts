@@ -1,11 +1,11 @@
-import { readFile, writeFile } from 'node:fs/promises'
+import { chmod, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import process from 'node:process'
-import type { CliConfig, GlobalOptions } from './types'
+import type { CliConfig, GlobalOptions, LegacyCliConfigV1 } from './types'
 
 export function defaultConfig(): CliConfig {
   return {
-    version: 1,
+    version: 2,
     player: {
       nickname: null,
     },
@@ -35,8 +35,11 @@ export function configPath(options: GlobalOptions = {}) {
 export async function loadConfig(options: GlobalOptions = {}) {
   const path = configPath(options)
   try {
-    const parsed = JSON.parse(await readFile(path, 'utf-8')) as CliConfig
-    return { path, config: { ...defaultConfig(), ...parsed } }
+    const parsed = JSON.parse(await readFile(path, 'utf-8')) as CliConfig | LegacyCliConfigV1
+    const config = migrateConfig(parsed)
+    if (parsed.version !== 2) await saveConfig(path, config)
+    else await chmod(path, 0o600)
+    return { path, config }
   }
   catch (error) {
     if (error && typeof error === 'object' && 'code' in error && (error as { code?: string }).code !== 'ENOENT') {
@@ -50,6 +53,57 @@ export async function loadConfig(options: GlobalOptions = {}) {
 
 export async function saveConfig(path: string, config: CliConfig) {
   await writeFile(path, `${JSON.stringify(config, null, 2)}\n`, 'utf-8')
+  await chmod(path, 0o600)
+}
+
+export function migrateConfig(input: CliConfig | LegacyCliConfigV1): CliConfig {
+  const base = defaultConfig()
+  if (input.version === 2) {
+    return {
+      ...base,
+      ...input,
+      player: { ...base.player, ...input.player },
+      current: { ...base.current, ...input.current },
+      stats: { ...base.stats, ...input.stats },
+      rooms: Object.fromEntries(Object.entries(input.rooms ?? {}).map(([roomId, room]) => [roomId, {
+        server: room.server,
+        roomId: room.roomId,
+        playerId: room.playerId ?? null,
+        resumeKey: room.resumeKey ?? null,
+        serverSeq: room.serverSeq ?? 0,
+        updatedAt: room.updatedAt ?? new Date(0).toISOString(),
+      }])),
+    }
+  }
+
+  return {
+    ...base,
+    player: { ...base.player, ...input.player },
+    current: {
+      ...base.current,
+      ...input.current,
+      playerId: null,
+    },
+    stats: { ...base.stats, ...input.stats },
+    rooms: Object.fromEntries(Object.entries(input.rooms ?? {}).map(([roomId, room]) => [roomId, {
+      server: room.server,
+      roomId: room.roomId,
+      playerId: null,
+      resumeKey: null,
+      serverSeq: room.serverSeq ?? 0,
+      updatedAt: room.updatedAt ?? new Date(0).toISOString(),
+    }])),
+  }
+}
+
+export function redactedConfig(config: CliConfig): CliConfig {
+  return {
+    ...structuredClone(config),
+    rooms: Object.fromEntries(Object.entries(config.rooms).map(([roomId, room]) => [roomId, {
+      ...room,
+      resumeKey: room.resumeKey ? '[redacted]' : null,
+    }])),
+  }
 }
 
 export function responseSeq(response: { serverSeq?: number; snapshotSeq?: number; next?: { seq?: number; type?: string } }) {
@@ -70,6 +124,7 @@ export function updateCurrentFromResponse(config: CliConfig, context: { server: 
       server: context.server,
       roomId: context.roomId,
       playerId,
+      resumeKey: config.rooms[context.roomId]?.resumeKey ?? null,
       serverSeq: config.current.serverSeq,
       updatedAt: new Date().toISOString(),
     }

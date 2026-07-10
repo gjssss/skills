@@ -40,6 +40,11 @@ describe('createBuildSteps', () => {
       },
       {
         command: 'bun',
+        args: ['run', '--cwd', 'packages/game/web-contract', 'build'],
+        cwd: '/repo',
+      },
+      {
+        command: 'bun',
         args: ['run', '--cwd', 'packages/game/frontend', 'build'],
         cwd: '/repo',
       },

@@ -13,14 +13,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@djd/game-core": "workspace:*",
+    "@djd/game-web-contract": "workspace:*",
     "@tanstack/react-router": "^1.168.3",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react-swc": "^4.3.0",
+    "tailwindcss": "^4.3.2",
     "typescript": "~5.9.3",
     "vite": "^7.3.1"
   }

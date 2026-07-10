@@ -38,6 +38,7 @@ export function findRepoRoot(startDir) {
 export function createBuildSteps(repoRoot) {
   return [
     ['bun', ['run', '--cwd', 'packages/game/core', 'build']],
+    ['bun', ['run', '--cwd', 'packages/game/web-contract', 'build']],
     ['bun', ['run', '--cwd', 'packages/game/frontend', 'build']],
     ['bun', ['run', '--cwd', 'packages/game/backend', 'build']],
     ['bun', ['run', '--cwd', 'packages/game/cli', 'build:cli']],

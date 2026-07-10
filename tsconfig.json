@@ -17,7 +17,8 @@
     "noEmit": true,
     "paths": {
       "@djd/game-backend": ["packages/game/backend/src/index.ts"],
-      "@djd/game-core": ["packages/game/core/src/index.ts"]
+      "@djd/game-core": ["packages/game/core/src/index.ts"],
+      "@djd/game-web-contract": ["packages/game/web-contract/src/index.ts"]
     },
 
     // Best practices

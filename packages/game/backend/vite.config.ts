@@ -17,6 +17,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         '@djd/game-core',
+        'bun:sqlite',
         ...builtinModules,
         ...builtinModules.map((module) => `node:${module}`),
       ],
