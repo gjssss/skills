@@ -3,8 +3,6 @@ import { createPlayerView, createPublicView } from '@djd/game-core'
 import { availableBids } from './bids'
 import type { ServerEvent } from './types'
 
-export const WAIT_TIMEOUT_MS = 10 * 60 * 1000
-
 export function now() {
   return new Date().toISOString()
 }

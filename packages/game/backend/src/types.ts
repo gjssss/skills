@@ -1,12 +1,6 @@
-import type { ServerSeq } from '@djd/game-core'
+import type { ControlMessage, ServerEvent } from '@djd/game-core'
 
-export interface ServerEvent {
-  seq: ServerSeq
-  roomId: string
-  type: string
-  createdAt: string
-  [key: string]: unknown
-}
+export type { ServerEvent } from '@djd/game-core'
 
 export interface GameServerOptions {
   host?: string
@@ -16,14 +10,18 @@ export interface GameServerOptions {
   log?: boolean
 }
 
-export interface Waiter {
-  playerId: string
-  resolve: (event: ServerEvent) => void
-  reject: (error: Error) => void
-  timer: ReturnType<typeof setTimeout>
-}
-
 export interface StoredIdempotency {
   payload: string
-  response: unknown
+  result: Extract<ControlMessage, { type: 'action.result' }>
+}
+
+export interface RoomMutation<T> {
+  result: T
+  events: ServerEvent[]
+}
+
+export interface SocketPeer {
+  readonly readyState: number
+  send(source: string): void
+  close(code?: number, reason?: string): void
 }

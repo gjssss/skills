@@ -3,10 +3,19 @@ import { startGameServer } from '@djd/game-backend'
 import { Command } from 'commander'
 import { parseActionFromInput } from './action-input'
 import { loadConfig, saveConfig, updateCurrentFromResponse, updateStats } from './config'
-import { asWsUrl, requestJson, resolveContext } from './http'
 import { printJson } from './output'
 import { resolveCliDist } from './paths'
 import type { GlobalOptions } from './types'
+import {
+  asHttpUrl,
+  asWebSocketUrl,
+  fetchEvents,
+  fetchState,
+  joinRoom,
+  resolveContext,
+  sessionMode,
+  submitAction,
+} from './ws'
 
 export function createProgram(version: string) {
   const program = new Command()
@@ -28,7 +37,7 @@ export function createProgram(version: string) {
   
   program
     .command('server')
-    .description('Start a local Dou Dizhu HTTP server')
+    .description('Start a local Dou Dizhu WebSocket server')
     .option('--host <host>', 'Set server host', '127.0.0.1')
     .option('--port <port>', 'Set server port', '8787')
     .option('--seed <seed>', 'Set deterministic seed')
@@ -37,12 +46,13 @@ export function createProgram(version: string) {
       const { path, config } = await loadConfig(globals)
       const port = Number(options.port)
       const seed = options.seed === undefined ? undefined : Number(options.seed)
-      const http = `http://${options.host}:${port}`
-      config.current.server = http
+      const server = asWebSocketUrl(`ws://${options.host}:${port}`)
+      const http = asHttpUrl(server)
+      config.current.server = server
       await saveConfig(path, config)
       printJson({
         ok: true,
-        server: asWsUrl(http),
+        server,
         http,
         seed,
       })
@@ -70,20 +80,38 @@ export function createProgram(version: string) {
       const { path, config } = await loadConfig(globals)
       const context = resolveContext(config, { ...globals, ...options })
       const name = options.name ?? config.player.nickname ?? `player-${Date.now()}`
-      const response = await requestJson<{
-        ok: true
-        joined: { playerId?: string }
-        serverSeq: number
-        next: { seq?: number; type?: string }
-      }>(context.server, `/rooms/${encodeURIComponent(context.roomId)}/join`, {
-        method: 'POST',
-        body: JSON.stringify({
-          name,
-          playerId: options.player ?? context.playerId,
-        }),
+      const playerId = options.player ?? context.playerId
+      const roomConfig = config.rooms[context.roomId]
+      const response = await joinRoom({
+        server: context.server,
+        roomId: context.roomId,
+        mode: playerId ? 'resume' : 'join',
+        name: playerId ? undefined : name,
+        playerId,
+        afterSeq: playerId ? (roomConfig?.serverSeq ?? config.current.serverSeq) : 0,
+        onAccepted: async (accepted) => {
+          const acceptedPlayerId = accepted.player?.playerId
+          config.current.server = context.server
+          config.current.roomId = context.roomId
+          if (acceptedPlayerId) config.current.playerId = acceptedPlayerId
+          if (acceptedPlayerId) {
+            config.rooms[context.roomId] = {
+              server: context.server,
+              roomId: context.roomId,
+              playerId: acceptedPlayerId,
+              serverSeq: roomConfig?.serverSeq ?? config.current.serverSeq,
+              updatedAt: new Date().toISOString(),
+            }
+          }
+          await saveConfig(path, config)
+        },
       })
       config.player.nickname = name
-      updateCurrentFromResponse(config, context, response)
+      const joinedPlayerId = typeof response.joined.playerId === 'string' ? response.joined.playerId : context.playerId
+      updateCurrentFromResponse(config, { ...context, playerId: joinedPlayerId }, {
+        serverSeq: response.serverSeq,
+        next: response.next,
+      })
       updateStats(config, config.current.playerId ?? undefined, response.next)
       await saveConfig(path, config)
       printJson(response)
@@ -107,18 +135,15 @@ export function createProgram(version: string) {
       const context = resolveContext(config, { ...globals, ...options })
       if (!context.playerId) throw new Error('playerId is required. Join a room first or pass --player.')
       const action = await parseActionFromInput(options, config)
-      const response = await requestJson<{
-        ok: true
-        serverSeq: number
-        applied: unknown
-        next: { seq?: number; type?: string }
-      }>(context.server, `/rooms/${encodeURIComponent(context.roomId)}/actions`, {
-        method: 'POST',
-        body: JSON.stringify({
-          playerId: context.playerId,
-          idempotencyKey: options.idempotencyKey ?? `${context.playerId}-${action.expectedSeq}-${Date.now()}`,
-          ...action,
-        }),
+      const idempotencyKey = options.idempotencyKey ?? `${context.playerId}-${action.expectedSeq}-${Date.now()}`
+      const response = await submitAction({
+        server: context.server,
+        roomId: context.roomId,
+        mode: 'resume',
+        playerId: context.playerId,
+        afterSeq: config.rooms[context.roomId]?.serverSeq ?? config.current.serverSeq,
+        action,
+        idempotencyKey,
       })
       updateCurrentFromResponse(config, context, response)
       updateStats(config, context.playerId, response.next)
@@ -138,7 +163,13 @@ export function createProgram(version: string) {
       const { config } = await loadConfig(globals)
       const context = resolveContext(config, { ...globals, ...options })
       const afterSeq = Number(options.afterSeq ?? config.current.serverSeq ?? 0)
-      const response = await requestJson(context.server, `/rooms/${encodeURIComponent(context.roomId)}/events?afterSeq=${afterSeq}`)
+      const response = await fetchEvents({
+        server: context.server,
+        roomId: context.roomId,
+        mode: sessionMode(context.playerId),
+        playerId: context.playerId,
+        afterSeq,
+      })
       printJson(response)
     })
   
@@ -154,8 +185,13 @@ export function createProgram(version: string) {
       const { path, config } = await loadConfig(globals)
       const context = resolveContext(config, { ...globals, ...options })
       const playerId = options.player ?? context.playerId
-      const query = playerId ? `?playerId=${encodeURIComponent(playerId)}` : ''
-      const response = await requestJson<{ ok: true; snapshotSeq: number }>(context.server, `/rooms/${encodeURIComponent(context.roomId)}/state${query}`)
+      const response = await fetchState({
+        server: context.server,
+        roomId: context.roomId,
+        mode: sessionMode(playerId),
+        playerId,
+        afterSeq: config.rooms[context.roomId]?.serverSeq ?? config.current.serverSeq,
+      })
       updateCurrentFromResponse(config, context, response)
       await saveConfig(path, config)
       printJson(response)
@@ -182,7 +218,7 @@ export function createProgram(version: string) {
       const globals = mergeOptions()
       const { path, config } = await loadConfig(globals)
       if (key === 'nickname') config.player.nickname = value
-      else if (key === 'server') config.current.server = value
+      else if (key === 'server') config.current.server = asWebSocketUrl(value)
       else throw new Error('Supported keys: nickname, server')
       await saveConfig(path, config)
       printJson({ ok: true, config })

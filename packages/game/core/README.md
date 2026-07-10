@@ -1,6 +1,6 @@
 # @djd/game-core
 
-Pure Dou Dizhu rules, state transitions, action validation, and protocol types.
+Pure Dou Dizhu rules, state transitions, action validation, and shared WebSocket protocol types.
 
 ## Scripts
 

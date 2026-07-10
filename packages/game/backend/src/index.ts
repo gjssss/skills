@@ -8,6 +8,7 @@ export * from './events'
 export * from './room'
 export * from './app'
 export * from './server'
+export * from './websocket'
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   startGameServer({
